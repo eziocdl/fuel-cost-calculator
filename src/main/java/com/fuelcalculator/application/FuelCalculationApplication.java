@@ -1,4 +1,4 @@
-package com.fuelcalculator.infracstructure.application;
+package com.fuelcalculator.application;
 
 public class FuelCalculationApplication {
 

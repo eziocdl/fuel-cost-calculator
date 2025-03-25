@@ -5,7 +5,7 @@ import com.fuelcalculator.usercases.FuelCalculationOutput;
 
 import java.util.List;
 
-public class FuelGatewayImpl implements FuelCalculationGateway {
+public class FueCalculationGatewayImpl implements FuelCalculationGateway {
 
     @Override
     public void saveCalculation(FuelCalculationOutput output) {

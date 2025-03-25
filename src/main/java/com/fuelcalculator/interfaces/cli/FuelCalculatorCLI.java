@@ -4,7 +4,7 @@ import com.fuelcalculator.adapters.controllers.FuelCalculationController;
 import com.fuelcalculator.adapters.gateways.FuelCalculationGateway;
 import com.fuelcalculator.adapters.presenters.FuelCalculatonPresenter;
 import com.fuelcalculator.domain.services.FuelCalculationService;
-import com.fuelcalculator.infraestructure.gatewayimp.FueCalculationGatewayImpl;
+import com.fuelcalculator.infraestructure.gatewayimp.FuelCalculationGatewayImpl;
 import com.fuelcalculator.usercases.CalculateFuelConsumptionUseCase;
 
 import java.util.Scanner;
@@ -40,7 +40,7 @@ public class FuelCalculatorCLI {
         FuelCalculationService fuelCalculationService = new FuelCalculationService();
         CalculateFuelConsumptionUseCase calculateFuelConsumptionUseCase = new CalculateFuelConsumptionUseCase(fuelCalculationService);
         FuelCalculatonPresenter fuelCalculationPresenter = new FuelCalculatonPresenter();
-        FuelCalculationGateway fuelCalculationGateway = new FueCalculationGatewayImpl();
+        FuelCalculationGateway fuelCalculationGateway = new FuelCalculationGatewayImpl();
         return new FuelCalculationController(calculateFuelConsumptionUseCase,
                 fuelCalculationPresenter, fuelCalculationGateway);
     }

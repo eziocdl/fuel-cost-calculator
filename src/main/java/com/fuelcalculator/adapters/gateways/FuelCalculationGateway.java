@@ -8,7 +8,7 @@ public interface FuelCalculationGateway {
 
     void saveCalculation(FuelCalculationOutput output);
 
-    List<FuelCalculationOutput> getCalculations();
+    void getCalculations();
 
     List<FuelCalculationOutput> getCalculationByPeriod(int month, int year);
 }

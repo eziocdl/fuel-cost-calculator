@@ -5,7 +5,7 @@ import com.fuelcalculator.usercases.FuelCalculationOutput;
 
 import java.util.List;
 
-public class FueCalculationGatewayImpl implements FuelCalculationGateway {
+public class FuelCalculationGatewayImpl implements FuelCalculationGateway {
 
     @Override
     public void saveCalculation(FuelCalculationOutput output) {
@@ -14,7 +14,7 @@ public class FueCalculationGatewayImpl implements FuelCalculationGateway {
     }
 
     @Override
-    public List<FuelCalculationOutput> getCalculations() {
+    public void getCalculations() {
         // TODO método para buscar todos os cálculos
 
         throw new UnsupportedOperationException("Método não implementado");

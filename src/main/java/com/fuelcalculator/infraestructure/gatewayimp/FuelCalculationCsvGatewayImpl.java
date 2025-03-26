@@ -15,11 +15,11 @@ import java.util.Optional;
 
 public class FuelCalculationCsvGatewayImpl implements FuelCalculationGateway {
 
-    private final String filePath = "src/main/resources/fuel_calculations.csv";
+    private final String filePath = "fuel_calculations.csv"; // Caminho do arquivo ajustado
     private long nextId = 1;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    public FuelCalculationCsvGatewayImpl() {
+    public FuelCalculationCsvGatewayImpl(String filePath) {
         // Garantir que o diretório exista
         Path directory = Paths.get("src/main/resources");
         if (!Files.exists(directory)) {
@@ -101,6 +101,7 @@ public class FuelCalculationCsvGatewayImpl implements FuelCalculationGateway {
             String line = calculation.getId() + "," + calculation.getConsumption() + "," + calculation.getCostPerKilometer() + "," + calculation.getCalculationDate().format(formatter);
             writer.write(line);
             writer.newLine();
+            System.out.println("Escrevendo no arquivo: " + line); // Log adicionado
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +127,10 @@ public class FuelCalculationCsvGatewayImpl implements FuelCalculationGateway {
                 double consumption = Double.parseDouble(values[1]);
                 double costPerKilometer = Double.parseDouble(values[2]);
                 LocalDate calculationDate = LocalDate.parse(values[3], formatter);
-                calculations.add(new FuelCalculationOutput(id, consumption, costPerKilometer, calculationDate));
+                FuelCalculationOutput calculation = new FuelCalculationOutput(id, consumption, costPerKilometer, calculationDate);
+                calculations.add(calculation);
+                System.out.println("Lendo do arquivo: " + line); // Log adicionado
+                System.out.println("Calculo lido: " + calculation); // Log adicionado
             }
         } catch (IOException e) {
             e.printStackTrace();

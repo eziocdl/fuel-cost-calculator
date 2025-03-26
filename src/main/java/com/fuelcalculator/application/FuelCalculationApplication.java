@@ -4,7 +4,7 @@ import com.fuelcalculator.adapters.controllers.FuelCalculationController;
 import com.fuelcalculator.adapters.gateways.FuelCalculationGateway;
 import com.fuelcalculator.adapters.presenters.FuelCalculatonPresenter;
 import com.fuelcalculator.domain.services.FuelCalculationService;
-import com.fuelcalculator.infraestructure.gatewayimp.FuelCalculationGatewayImpl;
+import com.fuelcalculator.infraestructure.gatewayimp.FuelCalculationCSVGatewayImpl;
 import com.fuelcalculator.usercases.CalculateFuelConsumptionUseCase;
 
 public class FuelCalculationApplication {
@@ -13,7 +13,7 @@ public class FuelCalculationApplication {
         FuelCalculationService fuelCalculationService = new FuelCalculationService();
         CalculateFuelConsumptionUseCase calculateFuelConsumptionUseCase = new CalculateFuelConsumptionUseCase(fuelCalculationService);
         FuelCalculatonPresenter fuelCalculationPresenter = new FuelCalculatonPresenter();
-        FuelCalculationGateway fuelCalculationGateway = new FuelCalculationGatewayImpl();
+        FuelCalculationGateway fuelCalculationGateway = new FuelCalculationCSVGatewayImpl();
         FuelCalculationController fuelCalculationController = new FuelCalculationController(calculateFuelConsumptionUseCase,
                 fuelCalculationPresenter, fuelCalculationGateway);
 

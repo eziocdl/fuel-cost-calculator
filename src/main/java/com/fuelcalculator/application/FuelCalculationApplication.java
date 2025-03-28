@@ -2,7 +2,7 @@ package com.fuelcalculator.application;
 
 import com.fuelcalculator.adapters.controllers.FuelCalculationController;
 import com.fuelcalculator.adapters.gateways.FuelCalculationGateway;
-import com.fuelcalculator.adapters.presenters.FuelCalculatonPresenter;
+import com.fuelcalculator.adapters.presenters.FuelCalculationPresenter;
 import com.fuelcalculator.domain.services.FuelCalculationService;
 import com.fuelcalculator.infraestructure.gatewayimp.FuelCalculationCsvGatewayImpl;
 import com.fuelcalculator.usercases.CalculateFuelConsumptionUseCase;
@@ -26,10 +26,11 @@ public class FuelCalculationApplication {
 
     private static FuelCalculationController getFuelCalculationController(FuelCalculationService fuelCalculationService) {
         CalculateFuelConsumptionUseCase calculateFuelConsumptionUseCase = new CalculateFuelConsumptionUseCase(fuelCalculationService);
-        FuelCalculatonPresenter fuelCalculationPresenter = new FuelCalculatonPresenter();
-        String filePath = "fuel_calculations.csv"; // Define filePath here
+        FuelCalculationPresenter fuelCalculationPresenter = new FuelCalculationPresenter();
+        String filePath = "fuel_calculations.csv";
         FuelCalculationGateway fuelCalculationGateway = new FuelCalculationCsvGatewayImpl(filePath);
-        return new FuelCalculationController(calculateFuelConsumptionUseCase,
-                fuelCalculationPresenter, fuelCalculationGateway);
+
+        // Correção: Passar os quatro argumentos na ordem correta
+        return new FuelCalculationController(fuelCalculationGateway, calculateFuelConsumptionUseCase, fuelCalculationPresenter, fuelCalculationGateway);
     }
 }

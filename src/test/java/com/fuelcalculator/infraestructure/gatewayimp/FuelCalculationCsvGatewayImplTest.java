@@ -1,11 +1,17 @@
 package com.fuelcalculator.infraestructure.gatewayimp;
 
+
 import com.fuelcalculator.usercases.FuelCalculationOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,86 +20,84 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FuelCalculationCsvGatewayImplTest {
 
     private FuelCalculationCsvGatewayImpl gateway;
-    private final String filePath = "fuel_calculations.csv"; // Caminho do arquivo ajustado
+    private final String TEST_FILE = "test_fuel_calculations.csv";
+    private final String TEST_ID_FILE = "test_fuel_calculations_id.txt";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @BeforeEach
-    public void setUp() throws Exception {
-        // Criar um arquivo de teste vazio
-        boolean created = new File(filePath).createNewFile();
-        if (!created) {
-            System.err.println("Falha ao criar o arquivo de teste: " + filePath);
-        }
-        gateway = new FuelCalculationCsvGatewayImpl(filePath);
+    void setUp() throws IOException {
+        Files.deleteIfExists(Paths.get("src/main/resources", TEST_FILE));
+        Files.deleteIfExists(Paths.get("src/main/resources", TEST_ID_FILE));
+        gateway = new FuelCalculationCsvGatewayImpl(TEST_FILE, TEST_ID_FILE);
     }
 
     @Test
-    public void saveCalculation_shouldSaveCalculationToFile() {
-        FuelCalculationOutput calculation = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.now());
-        Optional<FuelCalculationOutput> savedCalculation = gateway.saveCalculation(calculation);
-        assertTrue(savedCalculation.isPresent());
-        assertEquals(calculation, savedCalculation.get());
+    void saveCalculation_shouldSaveCalculationToFile() throws IOException {
+        FuelCalculationOutput output = new FuelCalculationOutput(null, 10.0, 5.0, LocalDate.of(2024, 5, 1));
+        Optional<FuelCalculationOutput> savedOutput = gateway.saveCalculation(output);
+
+        assertTrue(savedOutput.isPresent());
+        assertEquals(1L, savedOutput.get().getId());
+
+        List<String> lines = Files.readAllLines(Paths.get("src/main/resources", TEST_FILE));
+        assertEquals("1,10.0,5.0,01-05-2024", lines.get(0));
     }
 
     @Test
-    public void getCalculations_shouldReturnAllCalculationsFromFile() {
-        FuelCalculationOutput calculation1 = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.now());
-        FuelCalculationOutput calculation2 = new FuelCalculationOutput(2L, 20.0, 10.0, LocalDate.now().plusDays(1));
-        gateway.saveCalculation(calculation1);
-        gateway.saveCalculation(calculation2);
-
+    void getCalculations_shouldReturnAllCalculationsFromFile() throws IOException {
+        createTestFileWithData();
         List<FuelCalculationOutput> calculations = gateway.getCalculations();
-        System.out.println("Calculations retornadas: " + calculations); // Log adicionado
+
         assertEquals(2, calculations.size());
-        assertEquals(calculation1, calculations.get(0));
-        assertEquals(calculation2, calculations.get(1));
+        assertEquals(1L, calculations.get(0).getId());
+        assertEquals(2L, calculations.get(1).getId());
     }
 
     @Test
-    public void getCalculationByPeriod_shouldReturnCalculationsInPeriod() {
-        FuelCalculationOutput calculation1 = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.of(2024, 5, 1));
-        FuelCalculationOutput calculation2 = new FuelCalculationOutput(2L, 20.0, 10.0, LocalDate.of(2024, 5, 10));
-        FuelCalculationOutput calculation3 = new FuelCalculationOutput(3L, 30.0, 15.0, LocalDate.of(2024, 6, 1));
-        gateway.saveCalculation(calculation1);
-        gateway.saveCalculation(calculation2);
-        gateway.saveCalculation(calculation3);
-
+    void getCalculationByPeriod_shouldReturnCalculationsInPeriod() throws IOException {
+        createTestFileWithData();
         List<FuelCalculationOutput> calculations = gateway.getCalculationByPeriod(5, 2024);
-        assertEquals(2, calculations.size());
-        assertEquals(calculation1, calculations.get(0));
-        assertEquals(calculation2, calculations.get(1));
+
+        assertEquals(1, calculations.size());
+        assertEquals(1L, calculations.get(0).getId());
     }
 
     @Test
-    public void updateCalculation_shouldUpdateCalculationInFile() {
-        FuelCalculationOutput calculation1 = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.now());
-        gateway.saveCalculation(calculation1);
+    void updateCalculation_shouldUpdateCalculationInFile() throws IOException {
+        createTestFileWithData();
+        FuelCalculationOutput updatedOutput = new FuelCalculationOutput(1L, 12.0, 6.0, LocalDate.of(2024, 5, 1));
+        Optional<FuelCalculationOutput> result = gateway.updateCalculation(updatedOutput);
 
-        FuelCalculationOutput updatedCalculation = new FuelCalculationOutput(1L, 20.0, 10.0, LocalDate.now().plusDays(1));
-        Optional<FuelCalculationOutput> result = gateway.updateCalculation(updatedCalculation);
         assertTrue(result.isPresent());
-        assertEquals(updatedCalculation, result.get());
+        assertEquals(12.0, result.get().getConsumption());
+
+        List<String> lines = Files.readAllLines(Paths.get("src/main/resources", TEST_FILE));
+        assertEquals("1,12.0,6.0,01-05-2024", lines.get(0));
     }
 
     @Test
-    public void deleteCalculation_shouldDeleteCalculationFromFile() {
-        FuelCalculationOutput calculation1 = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.now());
-        gateway.saveCalculation(calculation1);
+    void deleteCalculation_shouldDeleteCalculationFromFile() throws IOException {
+        createTestFileWithData();
+        FuelCalculationOutput outputToDelete = new FuelCalculationOutput(1L, 10.0, 5.0, LocalDate.of(2024, 5, 1));
+        boolean deleted = gateway.deleteCalculation(outputToDelete);
 
-        boolean result = gateway.deleteCalculation(calculation1);
-        assertTrue(result);
+        assertTrue(deleted);
+        assertEquals(1, gateway.getCalculations().size());
+
+        List<String> lines = Files.readAllLines(Paths.get("src/main/resources", TEST_FILE));
+        assertEquals("2,20.0,10.0,02-05-2024", lines.get(0));
     }
 
     @Test
-    public void getCalculations_shouldReturnEmptyListIfFileIsEmpty() {
-        // Excluir o arquivo de teste e criar um novo vazio
-        new File(filePath).delete();
-        try {
-            new File(filePath).createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    void getCalculations_shouldReturnEmptyListIfFileIsEmpty() {
         List<FuelCalculationOutput> calculations = gateway.getCalculations();
         assertTrue(calculations.isEmpty());
+    }
+
+    private void createTestFileWithData() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get("src/main/resources", TEST_FILE).toFile()))) {
+            writer.write("1,10.0,5.0,01-05-2024\n");
+            writer.write("2,20.0,10.0,02-05-2024\n");
+        }
     }
 }

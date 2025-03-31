@@ -13,20 +13,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Interface de linha de comando (CLI) para a calculadora de consumo de combustível.
+ * Esta classe gerencia a interação com o usuário, processando entradas e exibindo resultados.
+ */
 public class FuelCalculatorCLI {
 
-    // Correção da linha 22 (supondo que "Obleto" era um erro de digitação para FuelCalculatorCLI)
+    /**
+     * Cria e retorna um controlador de cálculo de combustível.
+     * @return Uma instância de FuelCalculationController configurada.
+     */
     private static FuelCalculationController getFuelCalculationController() {
         FuelCalculationService fuelCalculationService = new FuelCalculationService();
         CalculateFuelConsumptionUseCase calculateFuelConsumptionUseCase = new CalculateFuelConsumptionUseCase(fuelCalculationService);
         FuelCalculationPresenter fuelCalculationPresenter = new FuelCalculationPresenter();
         String filePath = "fuel_calculations.csv";
         FuelCalculationGateway fuelCalculationGateway = new FuelCalculationCsvGatewayImpl(filePath);
-
-        // Correção: Passar o segundo gateway como o quarto argumento
         return new FuelCalculationController(fuelCalculationGateway, calculateFuelConsumptionUseCase, fuelCalculationPresenter, fuelCalculationGateway);
     }
 
+    /**
+     * Método principal que inicia a aplicação CLI.
+     * @param args Argumentos da linha de comando (não utilizados).
+     */
     public static void main(String[] args) {
         FuelCalculationController fuelCalculationController = getFuelCalculationController();
         Scanner scanner = new Scanner(System.in);
@@ -53,7 +62,7 @@ public class FuelCalculatorCLI {
                     listCalculations(fuelCalculationController);
                     break;
                 case 3:
-                    updateCalculation(scanner, fuelCalculationController); // Chamada corrigida
+                    updateCalculation(scanner, fuelCalculationController);
                     break;
                 case 4:
                     deleteCalculation(scanner, fuelCalculationController);
@@ -72,6 +81,11 @@ public class FuelCalculatorCLI {
         scanner.close();
     }
 
+    /**
+     * Cria um novo cálculo de consumo de combustível com base na entrada do usuário.
+     * @param scanner O scanner para ler a entrada do usuário.
+     * @param controller O controlador para processar a solicitação de cálculo.
+     */
     private static void createCalculation(Scanner scanner, FuelCalculationController controller) {
         System.out.print("Quilometragem Inicial: ");
         double initialKilometers = scanner.nextDouble();
@@ -85,10 +99,13 @@ public class FuelCalculatorCLI {
         System.out.print("Custo Total: R$ ");
         double totalCost = scanner.nextDouble();
 
-
         controller.handleCalculationRequest(initialKilometers, litersFilled, finalKilometers, totalCost);
     }
 
+    /**
+     * Lista todos os cálculos de consumo de combustível armazenados.
+     * @param controller O controlador para recuperar a lista de cálculos.
+     */
     private static void listCalculations(FuelCalculationController controller) {
         List<FuelCalculationOutput> calculations = controller.getCalculations();
         if (calculations.isEmpty()) {
@@ -106,7 +123,12 @@ public class FuelCalculatorCLI {
         }
     }
 
-    private static void updateCalculation(Scanner scanner, FuelCalculationController controller) { // Método corrigido
+    /**
+     * Atualiza um cálculo de consumo de combustível existente com base na entrada do usuário.
+     * @param scanner O scanner para ler a entrada do usuário.
+     * @param controller O controlador para processar a atualização do cálculo.
+     */
+    private static void updateCalculation(Scanner scanner, FuelCalculationController controller) {
         System.out.print("ID do Cálculo a Atualizar: ");
         long id = scanner.nextLong();
         System.out.print("Nova Quilometragem Inicial: ");
@@ -118,7 +140,6 @@ public class FuelCalculatorCLI {
         System.out.print("Novo Custo Total: ");
         double totalCost = scanner.nextDouble();
 
-        // Calculate consumption and cost per kilometer
         double consumption = litersFilled / (finalKilometers - initialKilometers);
         double costPerKilometer = totalCost / (finalKilometers - initialKilometers);
 
@@ -127,6 +148,11 @@ public class FuelCalculatorCLI {
         result.ifPresent(System.out::println);
     }
 
+    /**
+     * Deleta um cálculo de consumo de combustível existente com base no ID fornecido pelo usuário.
+     * @param scanner O scanner para ler a entrada do usuário.
+     * @param controller O controlador para processar a exclusão do cálculo.
+     */
     private static void deleteCalculation(Scanner scanner, FuelCalculationController controller) {
         System.out.print("ID do Cálculo a Deletar: ");
         long id = scanner.nextLong();
@@ -135,6 +161,11 @@ public class FuelCalculatorCLI {
         System.out.println(deleted ? "Cálculo deletado com sucesso!" : "Falha ao deletar cálculo.");
     }
 
+    /**
+     * Gera um relatório de cálculos de consumo de combustível para um período especificado pelo usuário.
+     * @param scanner O scanner para ler a entrada do usuário.
+     * @param controller O controlador para recuperar os cálculos por período.
+     */
     private static void reportByPeriod(Scanner scanner, FuelCalculationController controller) {
         System.out.print("Mês: ");
         int month = scanner.nextInt();

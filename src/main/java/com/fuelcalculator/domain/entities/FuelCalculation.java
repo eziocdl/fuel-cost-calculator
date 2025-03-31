@@ -1,5 +1,10 @@
 package com.fuelcalculator.domain.entities;
 
+
+/**
+ * Entidade que representa os parâmetros que serão usados no  cálculo de combustível.
+ *
+ */
 public class FuelCalculation {
 
 

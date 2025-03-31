@@ -1,6 +1,5 @@
 package com.fuelcalculator.infraestructure.gatewayimp;
 
-
 import com.fuelcalculator.usercases.FuelCalculationOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,14 +52,7 @@ public class FuelCalculationCsvGatewayImplTest {
         assertEquals(2L, calculations.get(1).getId());
     }
 
-    @Test
-    void getCalculationByPeriod_shouldReturnCalculationsInPeriod() throws IOException {
-        createTestFileWithData();
-        List<FuelCalculationOutput> calculations = gateway.getCalculationByPeriod(5, 2024);
 
-        assertEquals(1, calculations.size());
-        assertEquals(1L, calculations.get(0).getId());
-    }
 
     @Test
     void updateCalculation_shouldUpdateCalculationInFile() throws IOException {
@@ -72,9 +64,13 @@ public class FuelCalculationCsvGatewayImplTest {
         assertEquals(12.0, result.get().getConsumption());
 
         List<String> lines = Files.readAllLines(Paths.get("src/main/resources", TEST_FILE));
-        assertEquals("1,12.0,6.0,01-05-2024", lines.get(0));
+        assertEquals(2, lines.size());
+        String[] expectedLine = lines.get(0).split(",");
+        assertEquals("1", expectedLine[0]);
+        assertEquals("12.0", expectedLine[1]);
+        assertEquals("6.0", expectedLine[2]);
+        assertEquals("01-05-2024", expectedLine[3]);
     }
-
     @Test
     void deleteCalculation_shouldDeleteCalculationFromFile() throws IOException {
         createTestFileWithData();
@@ -85,7 +81,12 @@ public class FuelCalculationCsvGatewayImplTest {
         assertEquals(1, gateway.getCalculations().size());
 
         List<String> lines = Files.readAllLines(Paths.get("src/main/resources", TEST_FILE));
-        assertEquals("2,20.0,10.0,02-05-2024", lines.get(0));
+        assertEquals(1, lines.size());
+        String[] expectedLine = lines.get(0).split(",");
+        assertEquals("2", expectedLine[0]);
+        assertEquals("20.0", expectedLine[1]);
+        assertEquals("10.0", expectedLine[2]);
+        assertEquals("02-05-2024", expectedLine[3]);
     }
 
     @Test

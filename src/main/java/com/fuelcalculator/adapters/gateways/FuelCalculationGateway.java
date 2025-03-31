@@ -5,7 +5,12 @@ import com.fuelcalculator.usercases.FuelCalculationOutput;
 import java.util.List;
 import java.util.Optional;
 
+
+/**
+ * Interface para gerenciar as operações de cálculo de combustível.
+ */
 public interface FuelCalculationGateway {
+
 
    Optional<FuelCalculationOutput> saveCalculation(FuelCalculationOutput output);
    List<FuelCalculationOutput> getCalculations();

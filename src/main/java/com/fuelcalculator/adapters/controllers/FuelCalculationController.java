@@ -3,7 +3,7 @@ package com.fuelcalculator.adapters.controllers;
 import com.fuelcalculator.adapters.gateways.FuelCalculationGateway;
 import com.fuelcalculator.adapters.presenters.FuelCalculationPresenter;
 import com.fuelcalculator.usercases.CalculateFuelConsumptionUseCase;
-import com.fuelcalculator.usercases.FuelCalculationInput;
+import com.fuelcalculator.usercases.FuelCalculationInputDTO;
 import com.fuelcalculator.usercases.FuelCalculationOutput;
 
 import java.util.List;
@@ -24,14 +24,25 @@ public class FuelCalculationController {
         this.fuelCalculationGateway = fuelCalculationGateway;
     }
 
-    public void handleCalculationRequest(double initialKilometers, double litersFilled, double finalKilometers, double totalCost) {
-        FuelCalculationInput input = new FuelCalculationInput(initialKilometers, litersFilled, finalKilometers, totalCost);
-        FuelCalculationOutput output = calculateFuelConsumptionUseCase.execute(input);
-        fuelCalculationPresenter.present(output);
+    /**
+     * Gera um relatrio explicando como o calculo de combustível foi feito.
+     *
+     * @param initialKilometers    quilômetros iniciais
+     * @param litersFilled         litros de combustível abastecidos
+     * @param finalKilometers      quilômetros finais
+     * @param totalCost            custo total em reais
+     * @return                      um relatrio explicando como o cálculo foi feito
+     */
 
-        // Adicionando a chamada para salvar o cálculo no arquivo CSV
-        fuelCalculationGateway.saveCalculation(output);
+    public void handleCalculationRequest(double initialKilometers, double litersFilled, double finalKilometers, double totalCost) {
+        FuelCalculationInputDTO calculationInput = new FuelCalculationInputDTO(initialKilometers, litersFilled, finalKilometers, totalCost);
+        FuelCalculationOutput calculationOutput = calculateFuelConsumptionUseCase.execute(calculationInput);
+        fuelCalculationPresenter.present(calculationOutput);
+
+
+        fuelCalculationGateway.saveCalculation(calculationOutput);
     }
+
     public List<FuelCalculationOutput> getCalculations() {
         return gateway.getCalculations();
     }
